@@ -25,6 +25,7 @@ export class ChamaService {
    * Join a chama using a join code
    */
   joinChama(joinCode: string): Observable<Chama> {
+    // Backend expects joinCode as query parameter
     return this.http.post<Chama>(
       `${this.apiUrl}/join?joinCode=${encodeURIComponent(joinCode)}`, 
       {}

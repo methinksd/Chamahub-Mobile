@@ -1,14 +1,18 @@
 // Core models and interfaces for Chamahub Mobile
+// Updated to match backend DTOs
 
 export interface LoginRequest {
-  identifier: string;  // can be email or username
+  identifier: string;  // can be email or username (matches backend)
   password: string;
 }
 
 export interface LoginResponse {
   token: string;
-  role: string;
+  statusCode: number;
+  message: string;
   userId: number;
+  role: string;
+  user?: User;
 }
 
 export interface SignupRequest {
@@ -33,36 +37,65 @@ export interface Chama {
   name: string;
   description?: string;
   createdBy: number;
+  joinCode?: string;
   createdAt?: string;
   memberCount?: number;
 }
 
+export interface CreateChamaRequest {
+  name: string;
+  description?: string;
+}
+
 export interface LoanApplication {
   id: number;
-  userId: number;
+  memberId: number;
+  userId?: number;  // alias for memberId
   chamaId: number;
+  fullName?: string;
+  email?: string;
+  phone?: string;
   amount: number;
   requestedAmount: number; // Alias for amount
-  purpose: string;
-  term: number; // in months
+  duration: number; // term in months
+  term: number; // alias for duration
   repaymentPeriod: number; // Alias for term
+  purpose: string;
+  loanType?: string;
+  salary?: number;
+  personalLoanInfo?: string;
+  mortgagePropertyValue?: number;
   interestRate: number;
+  totalRepayment?: number;
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'DISBURSED';
-  appliedDate: string;
-  applicationDate: string; // Alias for appliedDate
+  createdAt: string;
+  appliedDate: string; // alias for createdAt
+  applicationDate: string; // Alias for createdAt
   approvedDate?: string;
+  username?: string;
+  remainingBalance?: number;
+  balance: number; // alias for remainingBalance
   monthlyPayment?: number;
-  balance: number;
   rejectionReason?: string;
 }
 
 export interface LoanPayment {
-  id: number;
+  id?: number;
   loanId: number;
+  paidByUserId?: number;
   amount: number;
+  amountPaid?: number; // alias for amount
   paymentDate: string;
-  status: 'COMPLETED' | 'PENDING' | 'FAILED';
+  paidByAdmin?: boolean;
+  status?: 'COMPLETED' | 'PENDING' | 'FAILED';
   transactionReference?: string;
+}
+
+export interface LoanStatusDTO {
+  loanId: number;
+  status: string;
+  remainingBalance: number;
+  totalPaid: number;
 }
 
 export interface ChamaMember {

@@ -30,12 +30,18 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(this.loginUrl, credentials).pipe(
       tap(async (response: LoginResponse) => {
-        await this.setAuthToken(response.token);
-        await this.setRole(response.role);
-        await Preferences.set({
-          key: this.USER_ID_KEY,
-          value: response.userId.toString()
-        });
+        if (response.statusCode === 200 && response.token) {
+          await this.setAuthToken(response.token);
+          await this.setRole(response.role);
+          await Preferences.set({
+            key: this.USER_ID_KEY,
+            value: response.userId.toString()
+          });
+          // Store username if available in response
+          if (response.user?.username) {
+            await this.setUsername(response.user.username);
+          }
+        }
       })
     );
   }

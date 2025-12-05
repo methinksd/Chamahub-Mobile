@@ -1,0 +1,34 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+ion-card {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.error-text {
+  font-size: 12px;
+  margin-top: 5px;
+  padding-left: 16px;
+}
+
+.signup-link {
+  margin-top: 16px;
+  
+  .link {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+}
+
+ion-button {
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  font-weight: 600;
+}

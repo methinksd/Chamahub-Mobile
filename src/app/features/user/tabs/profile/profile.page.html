@@ -10,11 +10,22 @@
     <ion-card>
       <ion-card-content>
         <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 16px 0;">
-          <ion-avatar style="width: 80px; height: 80px; margin-bottom: 16px;">
-            <div style="width: 100%; height: 100%; background: var(--ion-color-primary); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: white;">
-              {{ userName.charAt(0).toUpperCase() }}
-            </div>
-          </ion-avatar>
+          <div style="position: relative;">
+            <ion-avatar style="width: 80px; height: 80px; margin-bottom: 16px;" (click)="changeProfilePhoto()">
+              <img *ngIf="profilePhotoPath" [src]="profilePhotoPath" alt="Profile photo" />
+              <div *ngIf="!profilePhotoPath" style="width: 100%; height: 100%; background: var(--ion-color-primary); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: white;">
+                {{ userName.charAt(0).toUpperCase() }}
+              </div>
+            </ion-avatar>
+            <ion-button 
+              fill="solid" 
+              size="small"
+              color="primary"
+              (click)="changeProfilePhoto()"
+              style="position: absolute; bottom: 10px; right: -5px; --padding-start: 8px; --padding-end: 8px; height: 32px; width: 32px; --border-radius: 50%;">
+              <ion-icon name="camera" slot="icon-only" style="font-size: 16px;"></ion-icon>
+            </ion-button>
+          </div>
           <h2 style="margin: 0 0 4px 0; font-size: 24px; font-weight: 700;">{{ userName }}</h2>
           <ion-label color="medium" style="display: flex; align-items: center; gap: 4px;">
             <ion-icon name="shield"></ion-icon>

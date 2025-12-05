@@ -1,0 +1,13 @@
+<div *ngIf="!isOnline" class="network-status-banner">
+  <ion-badge color="danger" style="padding: 8px 16px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+    <ion-icon name="cloud-offline"></ion-icon>
+    <span>You are offline</span>
+  </ion-badge>
+</div>
+
+<div *ngIf="isOnline && connectionType !== 'wifi' && connectionType !== 'unknown'" class="network-status-banner">
+  <ion-badge color="warning" style="padding: 8px 16px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+    <ion-icon name="wifi"></ion-icon>
+    <span>Using mobile data ({{ connectionType }})</span>
+  </ion-badge>
+</div>

@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { NetworkStatusComponent } from './shared/components/network-status/network-status.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet],
+  imports: [IonApp, IonRouterOutlet, NetworkStatusComponent],
 })
 export class AppComponent {
   constructor() {}

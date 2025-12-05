@@ -8,6 +8,7 @@ import {
   IonText, IonSpinner, ToastController
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../../core/services/auth.service';
+import { NativeService } from '../../../core/services/native.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -32,6 +33,7 @@ export class LoginPage implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
+    private nativeService: NativeService,
     private toastController: ToastController
   ) {
     this.loginForm = this.fb.group({
@@ -59,6 +61,7 @@ export class LoginPage implements OnInit {
 
   async onSubmit() {
     if (this.loginForm.valid) {
+      await this.nativeService.hapticsImpactMedium();
       this.isLoading = true;
 
       const loginData = {
@@ -77,6 +80,7 @@ export class LoginPage implements OnInit {
           const role = (res.role || 'user').toLowerCase();
 
           if (token) {
+            await this.nativeService.hapticsNotificationSuccess();
             await this.showToast('Login successful!', 'success');
 
             // Small delay to ensure token is saved
@@ -94,12 +98,14 @@ export class LoginPage implements OnInit {
             }, 100);
           } else {
             console.error('❌ No token received in response!');
+            await this.nativeService.hapticsNotificationError();
             await this.showToast('Login failed: no token received', 'danger');
           }
         },
         error: async (err: HttpErrorResponse) => {
           this.isLoading = false;
           console.error('❌ Login error:', err);
+          await this.nativeService.hapticsNotificationError();
           const message = err.error?.message || 'Invalid credentials. Please try again.';
           await this.showToast(message, 'danger');
         }

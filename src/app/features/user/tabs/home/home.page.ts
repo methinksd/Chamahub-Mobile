@@ -23,6 +23,7 @@ import { cash, people, wallet, arrowForward } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ChamaService } from '../../../../core/services/chama.service';
 import { LoanService } from '../../../../core/services/loan.service';
+import { NativeService } from '../../../../core/services/native.service';
 import { Chama } from '../../../../core/models';
 
 @Component({
@@ -60,6 +61,7 @@ export class HomePage implements OnInit {
     private authService: AuthService,
     private chamaService: ChamaService,
     private loanService: LoanService,
+    private nativeService: NativeService,
     private router: Router
   ) {
     addIcons({ cash, people, wallet, arrowForward });
@@ -114,15 +116,18 @@ export class HomePage implements OnInit {
   }
 
   async handleRefresh(event: RefresherCustomEvent) {
+    await this.nativeService.hapticsImpactLight();
     await this.loadHomeData();
     event.target.complete();
   }
 
-  navigateToLoans() {
+  async navigateToLoans() {
+    await this.nativeService.hapticsImpactMedium();
     this.router.navigate(['/dashboard/loans']);
   }
 
-  navigateToPayments() {
+  async navigateToPayments() {
+    await this.nativeService.hapticsImpactMedium();
     this.router.navigate(['/dashboard/payments']);
   }
 }

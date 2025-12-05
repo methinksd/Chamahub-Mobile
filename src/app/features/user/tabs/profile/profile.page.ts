@@ -16,13 +16,16 @@ import {
   IonIcon,
   IonButton,
   IonAvatar,
-  AlertController
+  AlertController,
+  ActionSheetController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { person, mail, call, business, logOut, settings, shield } from 'ionicons/icons';
+import { person, mail, call, business, logOut, settings, shield, camera, images } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
 import { ChamaService } from '../../../../core/services/chama.service';
+import { CameraService } from '../../../../core/services/camera.service';
+import { NativeService } from '../../../../core/services/native.service';
 
 @Component({
   selector: 'app-profile',
@@ -53,20 +56,25 @@ export class ProfilePage implements OnInit {
   userPhone = '';
   chamaName = '';
   userRole = '';
+  profilePhotoPath = '';
   isLoading = true;
 
   constructor(
     private authService: AuthService,
     private userService: UserService,
     private chamaService: ChamaService,
+    private cameraService: CameraService,
+    private nativeService: NativeService,
     private router: Router,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private actionSheetController: ActionSheetController
   ) {
-    addIcons({ person, mail, call, business, logOut, settings, shield });
+    addIcons({ person, mail, call, business, logOut, settings, shield, camera, images });
   }
 
   async ngOnInit() {
     await this.loadProfile();
+    await this.loadProfilePhoto();
   }
 
   async loadProfile() {
@@ -125,6 +133,79 @@ export class ProfilePage implements OnInit {
     });
 
     await alert.present();
+  }
+
+  async loadProfilePhoto() {
+    const userId = await this.authService.getUserId();
+    if (userId) {
+      const photoPath = await this.cameraService.loadPhoto(`profile_${userId}`);
+      this.profilePhotoPath = photoPath || '';
+    }
+  }
+
+  async changeProfilePhoto() {
+    await this.nativeService.hapticsImpactLight();
+    
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Change Profile Photo',
+      buttons: [
+        {
+          text: 'Take Photo',
+          icon: 'camera',
+          handler: async () => {
+            await this.takePhoto();
+          }
+        },
+        {
+          text: 'Choose from Gallery',
+          icon: 'images',
+          handler: async () => {
+            await this.pickPhoto();
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          icon: 'close'
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+  private async takePhoto() {
+    try {
+      const userId = await this.authService.getUserId();
+      if (!userId) return;
+
+      const photoPath = await this.cameraService.takePhoto(`profile_${userId}`);
+      if (photoPath) {
+        this.profilePhotoPath = photoPath;
+        await this.nativeService.hapticsNotificationSuccess();
+        await this.nativeService.showToast('Profile photo updated', 'short');
+      }
+    } catch (error) {
+      console.error('Error taking photo:', error);
+      await this.nativeService.showToast('Failed to capture photo', 'short');
+    }
+  }
+
+  private async pickPhoto() {
+    try {
+      const userId = await this.authService.getUserId();
+      if (!userId) return;
+
+      const photoPath = await this.cameraService.pickPhoto(`profile_${userId}`);
+      if (photoPath) {
+        this.profilePhotoPath = photoPath;
+        await this.nativeService.hapticsNotificationSuccess();
+        await this.nativeService.showToast('Profile photo updated', 'short');
+      }
+    } catch (error) {
+      console.error('Error picking photo:', error);
+      await this.nativeService.showToast('Failed to select photo', 'short');
+    }
   }
 
   async logout() {

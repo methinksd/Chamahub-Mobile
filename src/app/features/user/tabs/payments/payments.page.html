@@ -1,0 +1,105 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Make Payment</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="loading-container" *ngIf="isLoading">
+    <ion-spinner></ion-spinner>
+    <p>Loading your loans...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="fade-in">
+    <div *ngIf="activeLoans.length > 0; else noLoans">
+      <!-- Payment Form -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Select Loan</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="stacked">Choose a loan to pay</ion-label>
+            <ion-select [(ngModel)]="selectedLoanId" placeholder="Select loan">
+              <ion-select-option *ngFor="let loan of activeLoans" [value]="loan.id">
+                Loan #{{ loan.id }} - Balance: KSh {{ loan.balance.toLocaleString() }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <div *ngIf="selectedLoan" style="margin-top: 16px; padding: 12px; background: var(--ion-color-light); border-radius: 8px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <div style="font-size: 12px; color: var(--ion-color-medium);">Remaining Balance</div>
+                <div style="font-weight: 700; color: var(--ion-color-danger);">KSh {{ selectedLoan.balance.toLocaleString() }}</div>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: var(--ion-color-medium);">Monthly Payment</div>
+                <div style="font-weight: 700;">KSh {{ selectedLoan.monthlyPayment?.toLocaleString() || 'N/A' }}</div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+              <ion-button size="small" fill="outline" (click)="setMonthlyPayment()">
+                <ion-icon slot="start" name="calculator"></ion-icon>
+                Monthly Amount
+              </ion-button>
+              <ion-button size="small" fill="outline" (click)="setFullPayment()">
+                <ion-icon slot="start" name="card"></ion-icon>
+                Pay in Full
+              </ion-button>
+            </div>
+          </div>
+
+          <ion-item style="margin-top: 16px;">
+            <ion-label position="stacked">Payment Amount (KSh)</ion-label>
+            <ion-input
+              type="number"
+              [(ngModel)]="paymentAmount"
+              placeholder="0.00"
+              [disabled]="!selectedLoanId"
+            ></ion-input>
+          </ion-item>
+
+          <ion-button
+            expand="block"
+            [disabled]="!selectedLoanId || !paymentAmount || paymentAmount <= 0 || isProcessing"
+            (click)="makePayment()"
+            style="margin-top: 24px;"
+          >
+            <ion-spinner *ngIf="isProcessing" style="margin-right: 8px;"></ion-spinner>
+            <ion-icon *ngIf="!isProcessing" slot="start" name="card"></ion-icon>
+            {{ isProcessing ? 'Processing...' : 'Submit Payment' }}
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Payment Information -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Payment Information</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-text color="medium">
+            <p style="margin: 0; font-size: 14px;">
+              <strong>Note:</strong> All payments are processed securely. 
+              Once submitted, your payment will be reviewed and your loan balance will be updated accordingly.
+            </p>
+          </ion-text>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <ng-template #noLoans>
+      <div class="empty-state">
+        <ion-icon name="card"></ion-icon>
+        <h3>No Active Loans</h3>
+        <p>You don't have any loans that require payment</p>
+      </div>
+    </ng-template>
+  </div>
+</ion-content>

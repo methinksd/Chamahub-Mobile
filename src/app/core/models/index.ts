@@ -23,6 +23,7 @@ export interface User {
   username: string;
   email: string;
   fullName?: string;
+  phoneNumber?: string;
   role: string;
   createdAt?: string;
 }
@@ -41,13 +42,18 @@ export interface LoanApplication {
   userId: number;
   chamaId: number;
   amount: number;
+  requestedAmount: number; // Alias for amount
   purpose: string;
   term: number; // in months
+  repaymentPeriod: number; // Alias for term
   interestRate: number;
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'DISBURSED';
   appliedDate: string;
+  applicationDate: string; // Alias for appliedDate
   approvedDate?: string;
   monthlyPayment?: number;
+  balance: number;
+  rejectionReason?: string;
 }
 
 export interface LoanPayment {

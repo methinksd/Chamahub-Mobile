@@ -1,13 +1,104 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>select-chama</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>Select Chama</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="confirmLogout()">
+        <ion-icon name="log-out" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">select-chama</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Pull to Refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="content-wrapper">
+    <!-- Welcome Section -->
+    <div class="welcome-section ion-padding">
+      <h2>Welcome!</h2>
+      <p>Select a chama to continue or join a new one</p>
+    </div>
+
+    <!-- Join Chama Card -->
+    <ion-card class="join-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="add-circle" class="title-icon"></ion-icon>
+          Join a Chama
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="floating">Enter Join Code</ion-label>
+          <ion-input 
+            [(ngModel)]="joinCode" 
+            placeholder="e.g., ABC123"
+            [disabled]="isJoining"
+          ></ion-input>
+        </ion-item>
+        <ion-button 
+          expand="block" 
+          (click)="joinChama()"
+          [disabled]="!joinCode.trim() || isJoining"
+          class="ion-margin-top"
+        >
+          <ion-spinner name="circles" *ngIf="isJoining"></ion-spinner>
+          <span *ngIf="!isJoining">Join Chama</span>
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- My Chamas Section -->
+    <div class="chamas-section ion-padding-horizontal">
+      <h3 class="section-title">
+        <ion-icon name="people"></ion-icon>
+        My Chamas
+      </h3>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-container">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Loading your chamas...</p>
+      </div>
+
+      <!-- Empty State -->
+      <ion-card *ngIf="!isLoading && chamas.length === 0" class="empty-state">
+        <ion-card-content class="ion-text-center">
+          <ion-icon name="people" class="empty-icon"></ion-icon>
+          <h3>No Chamas Yet</h3>
+          <p>Join a chama using a join code to get started</p>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Chamas List -->
+      <ion-list *ngIf="!isLoading && chamas.length > 0" class="chamas-list">
+        <ion-card *ngFor="let chama of chamas" class="chama-card" (click)="enterChama(chama)">
+          <ion-card-header>
+            <ion-card-title>{{ chama.name }}</ion-card-title>
+            <ion-card-subtitle *ngIf="chama.description">
+              {{ chama.description }}
+            </ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="chama-meta">
+              <ion-badge color="primary" *ngIf="chama.memberCount">
+                {{ chama.memberCount }} members
+              </ion-badge>
+              <span class="created-date" *ngIf="chama.createdAt">
+                Created: {{ chama.createdAt | date:'shortDate' }}
+              </span>
+            </div>
+            <ion-button fill="clear" size="small" class="enter-btn">
+              <ion-icon name="enter" slot="start"></ion-icon>
+              Enter
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+    </div>
+  </div>
 </ion-content>
+

@@ -16,6 +16,7 @@ export class AuthService {
   private readonly TOKEN_KEY = 'authToken';
   private readonly ROLE_KEY = 'userRole';
   private readonly USER_ID_KEY = 'userId';
+  private readonly USERNAME_KEY = 'username';
   private readonly ACTIVE_CHAMA_KEY = 'activeChamaId';
 
   constructor(private http: HttpClient) {}
@@ -45,6 +46,7 @@ export class AuthService {
     await Preferences.remove({ key: this.TOKEN_KEY });
     await Preferences.remove({ key: this.ROLE_KEY });
     await Preferences.remove({ key: this.USER_ID_KEY });
+    await Preferences.remove({ key: this.USERNAME_KEY });
     await Preferences.remove({ key: this.ACTIVE_CHAMA_KEY });
   }
 
@@ -106,5 +108,26 @@ export class AuthService {
   async getActiveChamaId(): Promise<number | null> {
     const result = await Preferences.get({ key: this.ACTIVE_CHAMA_KEY });
     return result.value ? parseInt(result.value, 10) : null;
+  }
+
+  // Additional helper methods
+  async getUserId(): Promise<number | null> {
+    return this.getCurrentUserId();
+  }
+
+  async getChamaId(): Promise<number | null> {
+    return this.getActiveChamaId();
+  }
+
+  async setUsername(username: string): Promise<void> {
+    await Preferences.set({
+      key: this.USERNAME_KEY,
+      value: username
+    });
+  }
+
+  async getUsername(): Promise<string | null> {
+    const result = await Preferences.get({ key: this.USERNAME_KEY });
+    return result.value;
   }
 }

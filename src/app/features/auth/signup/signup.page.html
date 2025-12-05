@@ -1,13 +1,120 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>signup</ion-title>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Sign Up</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">signup</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="signup-container">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Create Your Account</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form [formGroup]="signupForm" (ngSubmit)="onSignUp()">
+          
+          <!-- Full Name -->
+          <ion-item>
+            <ion-label position="floating">Full Name</ion-label>
+            <ion-input 
+              type="text" 
+              formControlName="fullName"
+              placeholder="Enter your full name"
+            ></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="fullName?.invalid && fullName?.touched">
+            <p class="error-text">
+              <span *ngIf="fullName?.hasError('required')">Full name is required</span>
+              <span *ngIf="fullName?.hasError('minlength')">Must be at least 3 characters</span>
+            </p>
+          </ion-text>
+
+          <!-- Username -->
+          <ion-item>
+            <ion-label position="floating">Username</ion-label>
+            <ion-input 
+              type="text" 
+              formControlName="username"
+              placeholder="Choose a username"
+            ></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="username?.invalid && username?.touched">
+            <p class="error-text">
+              <span *ngIf="username?.hasError('required')">Username is required</span>
+              <span *ngIf="username?.hasError('minlength')">Must be at least 3 characters</span>
+            </p>
+          </ion-text>
+
+          <!-- Email -->
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input 
+              type="email" 
+              formControlName="email"
+              placeholder="your@email.com"
+            ></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="email?.invalid && email?.touched">
+            <p class="error-text">
+              <span *ngIf="email?.hasError('required')">Email is required</span>
+              <span *ngIf="email?.hasError('email')">Enter a valid email address</span>
+            </p>
+          </ion-text>
+
+          <!-- Password -->
+          <ion-item>
+            <ion-label position="floating">Password</ion-label>
+            <ion-input 
+              type="password" 
+              formControlName="password"
+              placeholder="Enter password"
+            ></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="password?.invalid && password?.touched">
+            <p class="error-text">
+              <span *ngIf="password?.hasError('required')">Password is required</span>
+              <span *ngIf="password?.hasError('minlength')">Must be at least 6 characters</span>
+            </p>
+          </ion-text>
+
+          <!-- Confirm Password -->
+          <ion-item>
+            <ion-label position="floating">Confirm Password</ion-label>
+            <ion-input 
+              type="password" 
+              formControlName="confirmPassword"
+              placeholder="Re-enter password"
+            ></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="(confirmPassword?.touched || signupForm.touched) && passwordMismatch">
+            <p class="error-text">Passwords do not match</p>
+          </ion-text>
+
+          <!-- Submit Button -->
+          <ion-button 
+            expand="block" 
+            type="submit" 
+            [disabled]="signupForm.invalid || isLoading"
+            class="ion-margin-top"
+          >
+            <ion-spinner name="circles" *ngIf="isLoading"></ion-spinner>
+            <span *ngIf="!isLoading">Create Account</span>
+          </ion-button>
+
+          <!-- Login Link -->
+          <div class="login-link ion-text-center ion-margin-top">
+            <ion-text color="medium">
+              Already have an account? 
+              <a routerLink="/login" class="link">Login</a>
+            </ion-text>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
+

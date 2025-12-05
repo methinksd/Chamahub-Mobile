@@ -1,0 +1,79 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Welcome, {{ userName }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="loading-container" *ngIf="isLoading">
+    <ion-spinner></ion-spinner>
+    <p>Loading your dashboard...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="fade-in">
+    <!-- Current Chama Card -->
+    <ion-card *ngIf="currentChama">
+      <ion-card-header>
+        <ion-card-subtitle>Your Chama</ion-card-subtitle>
+        <ion-card-title>{{ currentChama.name }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--ion-color-medium);">
+          <ion-icon name="people"></ion-icon>
+          <span>{{ currentChama.memberCount || 0 }} members</span>
+        </div>
+        <p style="margin-top: 12px; color: var(--ion-color-dark);">
+          {{ currentChama.description || 'Your community savings group' }}
+        </p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Quick Stats -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Loan Overview</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <div style="font-size: 12px; color: var(--ion-color-medium); text-transform: uppercase; margin-bottom: 4px;">Active Loans</div>
+            <div style="font-size: 24px; font-weight: 700; color: var(--ion-color-primary);">{{ activeLoansCount }}</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--ion-color-medium); text-transform: uppercase; margin-bottom: 4px;">Total Balance</div>
+            <div style="font-size: 24px; font-weight: 700; color: var(--ion-color-danger);">KSh {{ totalLoanBalance.toLocaleString() }}</div>
+          </div>
+        </div>
+
+        <div *ngIf="nextPaymentDue" style="margin-top: 16px; padding: 12px; background: var(--ion-color-light); border-radius: 8px;">
+          <div style="font-size: 12px; color: var(--ion-color-medium); margin-bottom: 4px;">Next Payment Due</div>
+          <div style="font-weight: 600;">{{ nextPaymentDue }}</div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Quick Actions -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Quick Actions</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-button expand="block" (click)="navigateToLoans()" style="margin-bottom: 12px;">
+          <ion-icon slot="start" name="cash"></ion-icon>
+          Apply for Loan
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+        
+        <ion-button expand="block" fill="outline" (click)="navigateToPayments()">
+          <ion-icon slot="start" name="wallet"></ion-icon>
+          Make Payment
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

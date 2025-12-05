@@ -148,6 +148,14 @@ export class LoanService {
   // ------------------- PAYMENTS -------------------
 
   /**
+   * Make a payment (simplified for mobile)
+   */
+  makePayment(payment: Partial<LoanPayment>): Observable<any> {
+    // Default to user payment endpoint
+    return this.http.post(`${this.userPaymentUrl}`, payment);
+  }
+
+  /**
    * Make a payment as a user
    */
   makeUserPayment(payment: Partial<LoanPayment>, chamaId: number): Observable<any> {

@@ -1,0 +1,130 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Loan Approvals</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="selectedFilter" (ionChange)="onFilterChange($event)">
+      <ion-segment-button value="PENDING">
+        <ion-label>Pending</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="APPROVED">
+        <ion-label>Approved</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="REJECTED">
+        <ion-label>Rejected</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="ALL">
+        <ion-label>All</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Loading loan applications...</p>
+  </div>
+
+  <div *ngIf="!isLoading && filteredLoans.length > 0">
+    <ion-card *ngFor="let loan of filteredLoans" class="loan-card">
+      <ion-card-header>
+        <div class="card-header-content">
+          <div>
+            <ion-card-title>KES {{ loan.amount?.toLocaleString() }}</ion-card-title>
+            <ion-card-subtitle>
+              <ion-icon name="person"></ion-icon>
+              User ID: {{ loan.userId }}
+            </ion-card-subtitle>
+          </div>
+          <ion-badge [color]="getStatusColor(loan.status)">{{ loan.status }}</ion-badge>
+        </div>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <div class="loan-details">
+          <div class="detail-row">
+            <span class="label">Purpose:</span>
+            <span class="value">{{ loan.purpose }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Duration:</span>
+            <span class="value">{{ loan.durationMonths }} months</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Interest Rate:</span>
+            <span class="value">{{ loan.interestRate }}%</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Applied:</span>
+            <span class="value">{{ loan.applicationDate | date: 'medium' }}</span>
+          </div>
+          <div *ngIf="loan.status === 'REJECTED' && loan.rejectionReason" class="rejection-info">
+            <strong>Rejection Reason:</strong>
+            <p>{{ loan.rejectionReason }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="loan.status === 'PENDING'" class="action-buttons">
+          <ion-button expand="block" color="success" (click)="approveLoan(loan)">
+            <ion-icon slot="start" name="checkmark-circle"></ion-icon>
+            Approve
+          </ion-button>
+          <ion-button expand="block" color="danger" fill="outline" (click)="openRejectModal(loan)">
+            <ion-icon slot="start" name="close-circle"></ion-icon>
+            Reject
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <div *ngIf="!isLoading && filteredLoans.length === 0" class="empty-state">
+    <ion-icon name="time-outline"></ion-icon>
+    <h3>No {{ selectedFilter === 'ALL' ? '' : selectedFilter.toLowerCase() }} loans</h3>
+    <p>There are no loan applications to display</p>
+  </div>
+</ion-content>
+
+<!-- Rejection Modal -->
+<ion-modal [isOpen]="showRejectModal" (didDismiss)="closeRejectModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="danger">
+        <ion-title>Reject Loan</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeRejectModal()">Close</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <h2>Loan Details</h2>
+      <p *ngIf="selectedLoan">
+        <strong>Amount:</strong> KES {{ selectedLoan.amount?.toLocaleString() }}<br>
+        <strong>Purpose:</strong> {{ selectedLoan.purpose }}
+      </p>
+      
+      <h3>Rejection Reason</h3>
+      <ion-textarea
+        [(ngModel)]="rejectionReason"
+        placeholder="Enter reason for rejection..."
+        rows="6"
+        [counter]="true"
+        maxlength="500"
+      ></ion-textarea>
+      
+      <ion-button 
+        expand="block" 
+        color="danger" 
+        (click)="confirmReject()"
+        [disabled]="!rejectionReason.trim()"
+      >
+        Confirm Rejection
+      </ion-button>
+    </ion-content>
+  </ng-template>
+</ion-modal>

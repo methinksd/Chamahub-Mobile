@@ -11,7 +11,7 @@ describe('AuthInterceptor', () => {
   let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
-    const authSpy = jasmine.createSpyObj('AuthService', ['getToken']);
+    const authSpy = jasmine.createSpyObj('AuthService', ['getAuthToken']);
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -36,7 +36,7 @@ describe('AuthInterceptor', () => {
 
   it('should add Authorization header when token exists', (done) => {
     const mockToken = 'test-jwt-token';
-    authServiceSpy.getToken.and.returnValue(Promise.resolve(mockToken));
+    authServiceSpy.getAuthToken.and.returnValue(Promise.resolve(mockToken));
 
     httpClient.get('/api/test').subscribe(() => {
       done();
@@ -51,7 +51,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('should not add Authorization header when no token', (done) => {
-    authServiceSpy.getToken.and.returnValue(Promise.resolve(null));
+    authServiceSpy.getAuthToken.and.returnValue(Promise.resolve(null));
 
     httpClient.get('/api/test').subscribe(() => {
       done();
@@ -65,7 +65,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('should not add Authorization header for login endpoint', (done) => {
-    authServiceSpy.getToken.and.returnValue(Promise.resolve('token'));
+    authServiceSpy.getAuthToken.and.returnValue(Promise.resolve('token'));
 
     httpClient.post(`${environment.apiUrl}/auth/login`, {}).subscribe(() => {
       done();
@@ -79,7 +79,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('should not add Authorization header for signup endpoint', (done) => {
-    authServiceSpy.getToken.and.returnValue(Promise.resolve('token'));
+    authServiceSpy.getAuthToken.and.returnValue(Promise.resolve('token'));
 
     httpClient.post(`${environment.apiUrl}/auth/signup`, {}).subscribe(() => {
       done();

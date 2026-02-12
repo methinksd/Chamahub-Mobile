@@ -1,0 +1,102 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Admin Overview</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="welcome-section">
+    <h2>Dashboard Overview</h2>
+    <p>Manage your chama effectively</p>
+  </div>
+
+  <!-- Stats Grid -->
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <ion-icon name="cash" color="primary"></ion-icon>
+            <h3>{{ stats.totalLoans }}</h3>
+            <p>Total Loans</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <ion-icon name="time-outline" color="warning"></ion-icon>
+            <h3>{{ stats.pendingLoans }}</h3>
+            <p>Pending</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col size="6">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <ion-icon name="checkmark-circle" color="success"></ion-icon>
+            <h3>{{ stats.approvedLoans }}</h3>
+            <p>Approved</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <ion-icon name="people" color="tertiary"></ion-icon>
+            <h3>{{ stats.totalMembers }}</h3>
+            <p>Members</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Financial Overview -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Financial Overview</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="financial-stat">
+        <span class="label">Total Loan Amount</span>
+        <span class="value">KES {{ stats.totalLoanAmount.toLocaleString() }}</span>
+      </div>
+      <div class="financial-stat">
+        <span class="label">Outstanding Balance</span>
+        <span class="value danger">KES {{ stats.outstandingBalance.toLocaleString() }}</span>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Quick Actions -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Quick Actions</ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="quick-actions">
+      <ion-button expand="block" (click)="navigateToApprovals()">
+        <ion-icon slot="start" name="checkmark-circle"></ion-icon>
+        Review Loan Applications
+        <ion-icon slot="end" name="arrow-forward"></ion-icon>
+      </ion-button>
+      <ion-button expand="block" fill="outline" (click)="navigateToMembers()">
+        <ion-icon slot="start" name="people"></ion-icon>
+        Manage Members
+        <ion-icon slot="end" name="arrow-forward"></ion-icon>
+      </ion-button>
+      <ion-button expand="block" fill="outline" (click)="navigateToReports()">
+        <ion-icon slot="start" name="stats-chart"></ion-icon>
+        View Reports
+        <ion-icon slot="end" name="arrow-forward"></ion-icon>
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

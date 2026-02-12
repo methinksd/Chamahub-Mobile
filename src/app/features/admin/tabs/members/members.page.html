@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Chama Members</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar 
+      [(ngModel)]="searchTerm" 
+      (ionInput)="handleSearch($event)"
+      placeholder="Search members...">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="filteredMembers.length === 0" class="empty-state">
+    <h3>No Members</h3>
+    <p>Member management coming soon</p>
+  </div>
+
+  <ion-list *ngIf="filteredMembers.length > 0">
+    <ion-item *ngFor="let member of filteredMembers">
+      <ion-avatar slot="start">
+        <div class="avatar-placeholder">{{ member.name?.charAt(0) }}</div>
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ member.name }}</h2>
+        <p>{{ member.email }}</p>
+      </ion-label>
+      <ion-badge slot="end" [color]="member.role === 'ADMIN' ? 'primary' : 'medium'">
+        {{ member.role }}
+      </ion-badge>
+    </ion-item>
+  </ion-list>
+</ion-content>

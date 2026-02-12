@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Reports & Analytics</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Loan Statistics</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6">
+            <div class="stat-item">
+              <ion-icon name="cash" color="primary"></ion-icon>
+              <h3>{{ stats.totalLoans }}</h3>
+              <p>Total Loans</p>
+            </div>
+          </ion-col>
+          <ion-col size="6">
+            <div class="stat-item">
+              <ion-icon name="checkmark-circle" color="success"></ion-icon>
+              <h3>{{ stats.activeLoans }}</h3>
+              <p>Active Loans</p>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Financial Summary</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="financial-row">
+        <span class="label">Total Disbursed</span>
+        <span class="value">KES {{ stats.totalDisbursed.toLocaleString() }}</span>
+      </div>
+      <div class="financial-row">
+        <span class="label">Total Repaid</span>
+        <span class="value success">KES {{ stats.totalRepaid.toLocaleString() }}</span>
+      </div>
+      <div class="financial-row">
+        <span class="label">Outstanding</span>
+        <span class="value danger">KES {{ (stats.totalDisbursed - stats.totalRepaid).toLocaleString() }}</span>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

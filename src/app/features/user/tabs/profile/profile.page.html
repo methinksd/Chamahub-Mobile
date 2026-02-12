@@ -72,9 +72,9 @@
     <!-- Actions -->
     <ion-card>
       <ion-card-content>
-        <ion-button expand="block" fill="outline" disabled style="margin-bottom: 12px;">
+        <ion-button expand="block" fill="outline" (click)="openSettings()" style="margin-bottom: 12px;">
           <ion-icon slot="start" name="settings"></ion-icon>
-          Settings (Coming Soon)
+          Settings
         </ion-button>
 
         <ion-button expand="block" color="danger" (click)="confirmLogout()">

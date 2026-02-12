@@ -54,6 +54,51 @@ export const routes: Routes = [
       }
     ]
   },
+  {
+    path: 'loan-details/:id',
+    loadComponent: () => import('./features/user/loan-details/loan-details.page').then(m => m.LoanDetailsPage),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings',
+    loadComponent: () => import('./features/user/settings/settings.page').then(m => m.SettingsPage),
+    canActivate: [AuthGuard]
+  },
+
+  // Admin routes (protected by AdminGuard)
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/admin-dashboard/admin-dashboard.page').then(m => m.AdminDashboardPage),
+    canActivate: [AuthGuard, AdminGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'tabs/overview',
+        pathMatch: 'full'
+      },
+      {
+        path: 'tabs',
+        children: [
+          {
+            path: 'overview',
+            loadComponent: () => import('./features/admin/tabs/overview/admin-overview.page').then(m => m.AdminOverviewPage)
+          },
+          {
+            path: 'loan-approvals',
+            loadComponent: () => import('./features/admin/tabs/loan-approvals/loan-approvals.page').then(m => m.LoanApprovalsPage)
+          },
+          {
+            path: 'members',
+            loadComponent: () => import('./features/admin/tabs/members/members.page').then(m => m.MembersPage)
+          },
+          {
+            path: 'reports',
+            loadComponent: () => import('./features/admin/tabs/reports/reports.page').then(m => m.ReportsPage)
+          }
+        ]
+      }
+    ]
+  },
 
   // Keep the original home page for reference (can be removed later)
   {

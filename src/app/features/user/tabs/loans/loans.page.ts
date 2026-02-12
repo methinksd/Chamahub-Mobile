@@ -110,12 +110,10 @@ export class LoansPage implements OnInit {
   }
 
   applyForLoan() {
-    // TODO: Navigate to loan application form
-    console.log('Apply for loan');
+    this.router.navigate(['/loan-application']);
   }
 
   viewLoanDetails(loan: LoanApplication) {
-    // TODO: Navigate to loan details page
-    console.log('View loan details:', loan);
+    this.router.navigate(['/loan-details', loan.id]);
   }
 }

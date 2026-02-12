@@ -177,6 +177,13 @@ export class LoanService {
   }
 
   /**
+   * Get all payments for a specific loan (user view)
+   */
+  getPaymentsByLoan(loanId: number, chamaId: number): Observable<LoanPayment[]> {
+    return this.http.get<LoanPayment[]>(`${this.userPaymentUrl}/loan/${loanId}?chamaId=${chamaId}`);
+  }
+
+  /**
    * Get total amount paid for a specific loan
    */
   getTotalPaidForLoan(loanId: number, chamaId: number): Observable<number> {

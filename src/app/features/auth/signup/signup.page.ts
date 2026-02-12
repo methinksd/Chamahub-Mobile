@@ -85,7 +85,18 @@ export class SignupPage implements OnInit {
       error: async (err: HttpErrorResponse) => {
         this.isLoading = false;
         console.error('❌ Signup error:', err);
-        const message = err.error?.message || 'Signup failed. Please try again.';
+        console.error('❌ Error status:', err.status);
+        console.error('❌ Error message:', err.message);
+        console.error('❌ Error details:', JSON.stringify(err.error));
+        
+        let message = 'Signup failed. Please check your connection.';
+        
+        if (err.status === 0) {
+          message = 'Cannot connect to server. Please check your internet connection.';
+        } else if (err.error?.message) {
+          message = err.error.message;
+        }
+        
         await this.showToast(message, 'danger');
       }
     });

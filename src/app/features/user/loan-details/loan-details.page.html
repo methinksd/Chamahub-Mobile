@@ -1,0 +1,157 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard/tabs/loans"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Loan Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading loan details...</p>
+  </div>
+
+  <div *ngIf="!isLoading && loan">
+    <!-- Loan Status Card -->
+    <ion-card>
+      <ion-card-header>
+        <div class="header-with-badge">
+          <ion-card-title>Loan #{{ loan.id }}</ion-card-title>
+          <ion-badge [color]="statusColor">{{ loan.status }}</ion-badge>
+        </div>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="loan-info">
+          <div class="info-row">
+            <span class="label">Amount Requested:</span>
+            <span class="value">KES {{ loan.amount?.toLocaleString() }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Purpose:</span>
+            <span class="value">{{ loan.purpose }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Duration:</span>
+            <span class="value">{{ loan.durationMonths }} months</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Interest Rate:</span>
+            <span class="value">{{ loan.interestRate }}% per annum</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Application Date:</span>
+            <span class="value">{{ loan.applicationDate | date: 'medium' }}</span>
+          </div>
+          <div *ngIf="loan.status === 'REJECTED' && loan.rejectionReason" class="info-row rejection">
+            <span class="label">Rejection Reason:</span>
+            <span class="value">{{ loan.rejectionReason }}</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Payment Progress Card (Only for Approved Loans) -->
+    <ion-card *ngIf="loan.status === 'APPROVED'">
+      <ion-card-header>
+        <ion-card-title>Payment Progress</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="progress-info">
+          <div class="progress-stats">
+            <div class="stat">
+              <span class="stat-label">Total Paid</span>
+              <span class="stat-value success">KES {{ totalPaid.toLocaleString() }}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Remaining</span>
+              <span class="stat-value danger">KES {{ loan.remainingBalance?.toLocaleString() }}</span>
+            </div>
+          </div>
+          <ion-progress-bar 
+            [value]="progressPercentage / 100" 
+            color="success">
+          </ion-progress-bar>
+          <p class="progress-text">{{ progressPercentage.toFixed(1) }}% paid</p>
+        </div>
+
+        <div class="payment-schedule">
+          <h3>Payment Schedule</h3>
+          <div class="info-row">
+            <span class="label">Monthly Payment:</span>
+            <span class="value">KES {{ monthlyPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Total Amount Due:</span>
+            <span class="value">KES {{ loan.amount?.toLocaleString() }}</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Action Buttons (Only for Approved Loans) -->
+    <div *ngIf="loan.status === 'APPROVED' && loan.remainingBalance && loan.remainingBalance > 0" class="action-buttons">
+      <ion-button expand="block" (click)="makePayment()">
+        <ion-icon slot="start" name="cash"></ion-icon>
+        Make Payment
+      </ion-button>
+      <ion-button expand="block" fill="outline" (click)="downloadStatement()">
+        <ion-icon slot="start" name="download"></ion-icon>
+        Download Statement
+      </ion-button>
+    </div>
+
+    <!-- Fully Paid Message -->
+    <ion-card *ngIf="loan.status === 'APPROVED' && loan.remainingBalance === 0" color="success">
+      <ion-card-content>
+        <div class="paid-off-message">
+          <ion-icon name="checkmark-circle"></ion-icon>
+          <h2>Loan Fully Paid!</h2>
+          <p>Congratulations! You have successfully paid off this loan.</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Payment History -->
+    <ion-card *ngIf="loan.status === 'APPROVED' && payments.length > 0">
+      <ion-card-header>
+        <ion-card-title>Payment History</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let payment of payments">
+            <ion-label>
+              <h3>KES {{ payment.amount?.toLocaleString() }}</h3>
+              <p>{{ payment.paymentDate | date: 'medium' }}</p>
+              <p *ngIf="payment.notes" class="payment-notes">{{ payment.notes }}</p>
+            </ion-label>
+            <ion-badge slot="end" [color]="getPaymentStatusColor(payment.status)">
+              {{ payment.status }}
+            </ion-badge>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- No Payment History -->
+    <ion-card *ngIf="loan.status === 'APPROVED' && payments.length === 0">
+      <ion-card-content>
+        <div class="empty-state">
+          <ion-icon name="document-text"></ion-icon>
+          <h3>No Payment History</h3>
+          <p>You haven't made any payments yet.</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <div *ngIf="!isLoading && !loan" class="error-state">
+    <ion-icon name="alert-circle"></ion-icon>
+    <h2>Loan Not Found</h2>
+    <p>Unable to load loan details.</p>
+    <ion-button (click)="router.navigate(['/dashboard/tabs/loans'])">
+      Back to Loans
+    </ion-button>
+  </div>
+</ion-content>

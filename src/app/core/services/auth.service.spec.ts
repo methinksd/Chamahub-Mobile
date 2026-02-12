@@ -2,13 +2,14 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
 import { environment } from '../../../environments/environment';
+import { Preferences } from '@capacitor/preferences';
 
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
   const API_URL = environment.apiUrl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [AuthService]
@@ -16,13 +17,13 @@ describe('AuthService', () => {
     service = TestBed.inject(AuthService);
     httpMock = TestBed.inject(HttpTestingController);
     
-    // Clear storage before each test
-    localStorage.clear();
+    // Clear Capacitor storage before each test
+    await Preferences.clear();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     httpMock.verify();
-    localStorage.clear();
+    await Preferences.clear();
   });
 
   describe('login', () => {
@@ -43,7 +44,7 @@ describe('AuthService', () => {
       service.login(mockLoginData).subscribe(response => {
         expect(response.token).toBe('mock-jwt-token');
         expect(response.role).toBe('USER');
-        expect(response.user.username).toBe('testuser');
+        expect(response.user?.username).toBe('testuser');
         done();
       });
 
@@ -94,55 +95,55 @@ describe('AuthService', () => {
   describe('token management', () => {
     it('should store token using Preferences', async () => {
       const token = 'test-token-123';
-      await service.storeToken(token);
+      await service.setAuthToken(token);
       
-      const storedToken = await service.getToken();
+      const storedToken = await service.getAuthToken();
       expect(storedToken).toBe(token);
     });
 
     it('should return null when no token stored', async () => {
-      const token = await service.getToken();
+      const token = await service.getAuthToken();
       expect(token).toBeNull();
     });
 
     it('should clear token on logout', async () => {
-      await service.storeToken('test-token');
+      await service.setAuthToken('test-token');
       await service.logout();
       
-      const token = await service.getToken();
+      const token = await service.getAuthToken();
       expect(token).toBeNull();
     });
   });
 
   describe('user data management', () => {
     it('should store and retrieve username', async () => {
-      await service.storeUsername('testuser');
+      await service.setUsername('testuser');
       const username = await service.getUsername();
       expect(username).toBe('testuser');
     });
 
     it('should store and retrieve userId', async () => {
-      await service.storeUserId('123');
+      await Preferences.set({ key: 'userId', value: '123' });
       const userId = await service.getUserId();
-      expect(userId).toBe('123');
+      expect(userId).toBe(123);
     });
 
     it('should store and retrieve chamaId', async () => {
-      await service.storeChamaId('456');
+      await service.setActiveChamaId(456);
       const chamaId = await service.getChamaId();
-      expect(chamaId).toBe('456');
+      expect(chamaId).toBe(456);
     });
 
     it('should store and retrieve user role', async () => {
-      await service.storeUserRole('ADMIN');
-      const role = await service.getUserRole();
-      expect(role).toBe('ADMIN');
+      await service.setRole('ADMIN');
+      const role = await service.getRole();
+      expect(role).toBe('admin');
     });
   });
 
   describe('authentication state', () => {
     it('should return true when token exists', async () => {
-      await service.storeToken('valid-token');
+      await service.setAuthToken('valid-token');
       const isAuth = await service.isAuthenticated();
       expect(isAuth).toBe(true);
     });
@@ -154,21 +155,21 @@ describe('AuthService', () => {
 
     it('should clear all user data on logout', async () => {
       // Store all user data
-      await service.storeToken('token');
-      await service.storeUsername('user');
-      await service.storeUserId('123');
-      await service.storeChamaId('456');
-      await service.storeUserRole('USER');
+      await service.setAuthToken('token');
+      await service.setUsername('user');
+      await Preferences.set({ key: 'userId', value: '123' });
+      await service.setActiveChamaId(456);
+      await service.setRole('USER');
 
       // Logout
       await service.logout();
 
       // Verify all cleared
-      expect(await service.getToken()).toBeNull();
+      expect(await service.getAuthToken()).toBeNull();
       expect(await service.getUsername()).toBeNull();
       expect(await service.getUserId()).toBeNull();
       expect(await service.getChamaId()).toBeNull();
-      expect(await service.getUserRole()).toBeNull();
+      expect(await service.getRole()).toBeNull();
     });
   });
 

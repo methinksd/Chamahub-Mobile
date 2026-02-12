@@ -9,7 +9,9 @@ import {
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../../core/services/auth.service';
 import { NativeService } from '../../../core/services/native.service';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpClient } from '@angular/common/http';
+import { Network } from '@capacitor/network';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -34,7 +36,8 @@ export class LoginPage implements OnInit {
     private router: Router,
     private authService: AuthService,
     private nativeService: NativeService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private http: HttpClient
   ) {
     this.loginForm = this.fb.group({
       identifier: ['', [Validators.required]], 
@@ -86,8 +89,8 @@ export class LoginPage implements OnInit {
             // Small delay to ensure token is saved
             setTimeout(() => {
               if (role === 'admin') {
-                console.log('✅ Admin login success! Redirecting to Dashboard...');
-                this.router.navigate(['/dashboard'], { replaceUrl: true });
+                console.log('✅ Admin login success! Redirecting to Admin Dashboard...');
+                this.router.navigate(['/admin'], { replaceUrl: true });
               } else if (role === 'user') {
                 console.log('✅ User login success! Redirecting to Select Chama...');
                 this.router.navigate(['/select-chama'], { replaceUrl: true });
@@ -105,12 +108,60 @@ export class LoginPage implements OnInit {
         error: async (err: HttpErrorResponse) => {
           this.isLoading = false;
           console.error('❌ Login error:', err);
+          console.error('❌ Error status:', err.status);
+          console.error('❌ Error message:', err.message);
+          console.error('❌ Error details:', JSON.stringify(err.error));
+          
           await this.nativeService.hapticsNotificationError();
-          const message = err.error?.message || 'Invalid credentials. Please try again.';
+          
+          let message = 'Login failed. Please check your connection.';
+          
+          if (err.status === 0) {
+            message = 'Cannot connect to server. Please check your internet connection.';
+          } else if (err.status === 401) {
+            message = err.error?.message || 'Invalid credentials. Please try again.';
+          } else if (err.error?.message) {
+            message = err.error.message;
+          }
+          
           await this.showToast(message, 'danger');
         }
       });
     }
+  }
+
+  async testConnection() {
+    await this.nativeService.hapticsImpactLight();
+    const status = await Network.getStatus();
+    console.log('Network status:', status);
+    
+    if (!status.connected) {
+      await this.showToast('No internet connection detected', 'danger');
+      return;
+    }
+    
+    await this.showToast('Testing server connection...', 'warning');
+    
+    this.http.get(`${environment.apiUrl}/auth/test`, { observe: 'response' }).subscribe({
+      next: async (response) => {
+        console.log('Connection test successful:', response);
+        await this.showToast('✅ Server connection successful!', 'success');
+      },
+      error: async (err: HttpErrorResponse) => {
+        console.error('Connection test failed:', err);
+        console.error('API URL:', environment.apiUrl);
+        console.error('Error status:', err.status);
+        console.error('Error message:', err.message);
+        
+        let message = 'Connection test failed. ';
+        if (err.status === 0) {
+          message += 'Cannot reach server. Check if backend is running.';
+        } else {
+          message += `Server returned error ${err.status}`;
+        }
+        await this.showToast(message, 'danger');
+      }
+    });
   }
 
   async showToast(message: string, color: 'success' | 'danger' | 'warning' = 'success') {

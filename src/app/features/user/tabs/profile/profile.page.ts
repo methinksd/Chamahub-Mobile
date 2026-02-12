@@ -135,6 +135,10 @@ export class ProfilePage implements OnInit {
     await alert.present();
   }
 
+  openSettings() {
+    this.router.navigate(['/settings']);
+  }
+
   async loadProfilePhoto() {
     const userId = await this.authService.getUserId();
     if (userId) {

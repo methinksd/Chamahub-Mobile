@@ -58,6 +58,7 @@ export interface LoanApplication {
   amount: number;
   requestedAmount: number; // Alias for amount
   duration: number; // term in months
+  durationMonths: number; // alias for duration
   term: number; // alias for duration
   repaymentPeriod: number; // Alias for term
   purpose: string;
@@ -83,6 +84,7 @@ export interface LoanPayment {
   id?: number;
   loanId: number;
   paidByUserId?: number;
+  notes?: string;
   amount: number;
   amountPaid?: number; // alias for amount
   paymentDate: string;

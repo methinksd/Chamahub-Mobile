@@ -68,3 +68,8 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Signing keys and credentials (NEVER commit these!)
+android/keystore.properties
+android/*.keystore
+android/*.jks
